@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Times Table Rock Stars Clone</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(120deg, #0b1220, #7c3aed);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 { color: #fff; }
+    #question { font-size: 28px; margin: 20px 0; }
+    input { padding: 8px; font-size: 16px; width: 120px; margin: 5px; border-radius: 8px; border: none; }
+    button { padding: 8px 16px; font-size: 16px; margin: 5px; border-radius: 8px; border: none; cursor: pointer; background: #7c3aed; color: #fff; }
+    #result { margin-top: 20px; font-size: 20px; }
+    #scoreboard, #timer { margin-top: 15px; font-size: 18px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<h1>Times Table Trainer</h1>
+
+<input id="playerName" type="text" placeholder="Enter your name" maxlength="20"><br>
+<p id="timer">Time left: 60s</p>
+<p id="question">Press Start to begin!</p>
+<input id="answer" type="number" placeholder="Answer">
+<div>
+  <button id="submitBtn">Submit</button>
+  <button id="startBtn">Start</button>
+</div>
+<p id="result"></p>
+<div id="scoreboard">Score: 0 | Streak: 0</div>
+
+<audio id="bgMusic" src="music.mp3" loop></audio>
+<button id="playMusic">Play Music</button>
+
+<script>
+  let a, b, correctAnswer;
+  let score = 0;
+  let streak = 0;
+  let timeLeft = 60;
+  let timerInterval;
+
+  const questionEl = document.getElementById('question');
+  const answerEl = document.getElementById('answer');
+  const resultEl = document.getElementById('result');
+  const scoreEl = document.getElementById('scoreboard');
+  const submitBtn = document.getElementById('submitBtn');
+  const startBtn = document.getElementById('startBtn');
+  const timerEl = document.getElementById('timer');
+  const playerEl = document.getElementById('playerName');
+  const bgMusic = document.getElementById('bgMusic');
+  const playMusicBtn = document.getElementById('playMusic');
+
+  function generateQuestion() {
+    a = Math.floor(Math.random() * 12) + 1;
+    b = Math.floor(Math.random() * 12) + 1;
+    correctAnswer = a * b;
+    questionEl.textContent = `What is ${a} × ${b}?`;
+    answerEl.value = '';
+    answerEl.focus();
+  }
+
+  function checkAnswer() {
+    const userAnswer = Number(answerEl.value);
+    if (userAnswer === correctAnswer) {
+      resultEl.textContent = "Correct!";
+      score += 10;
+      streak += 1;
+      timeLeft += 2; // small bonus time
+    } else {
+      resultEl.textContent = `Wrong! The correct answer was ${correctAnswer}.`;
+      streak = 0;
+    }
+    scoreEl.textContent = `Score: ${score} | Streak: ${streak}`;
+    generateQuestion();
+  }
+
+  function startTimer() {
+    timeLeft = 60;
+    timerEl.textContent = `Time left: ${timeLeft}s`;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = `Time left: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        const player = playerEl.value || 'Player';
+        alert(`Time's up, ${player}! Your final score is ${score}`);
+        score = 0;
+        streak = 0;
+        scoreEl.textContent = `Score: ${score} | Streak: ${streak}`;
+        questionEl.textContent = 'Press Start to begin!';
+        resultEl.textContent = '';
+      }
+    }, 1000);
+  }
+
+  startBtn.addEventListener('click', function() {
+    score = 0;
+    streak = 0;
+    scoreEl.textContent = `Score: ${score} | Streak: ${streak}`;
+    resultEl.textContent = '';
+    generateQuestion();
+    startTimer();
+  });
+
+  submitBtn.addEventListener('click', checkAnswer);
+  answerEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  playMusicBtn.addEventListener('click', () => {
+    bgMusic.play();
+  });
+</script>
+
+</body>
+</html>
